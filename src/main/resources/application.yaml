@@ -1,0 +1,12 @@
+server:
+  port: ${PORT:8080}
+
+blog:
+  crypto:
+    secret-key: ${SECRET_KEY:secretkey }
+  oauth:
+    base-url: https://github.com
+    access-token-path: /login/oauth/access_token
+    user-base-url: https://api.github.com
+    user-profile-path: /user
+    user-email-path: /user/emails
