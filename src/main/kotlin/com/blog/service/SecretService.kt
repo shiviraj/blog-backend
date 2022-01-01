@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
 
 @Service
-class SecretService(val secretRepository: SecretRepository, val crypto: Crypto) {
+class SecretService(private val secretRepository: SecretRepository, private val crypto: Crypto) {
     fun getClientId(): Mono<Secret> {
         return getSecret(SecretKeys.GITHUB_CLIENT_ID)
     }
@@ -19,12 +19,9 @@ class SecretService(val secretRepository: SecretRepository, val crypto: Crypto) 
     private fun getSecret(secretKey: SecretKeys): Mono<Secret> {
         return secretRepository.findByKey(secretKey)
             .map {
-                it.value = crypto.decrypt(it.value)
-                it
+                it.decryptValue(crypto.decrypt(it.value))
             }
     }
-
-
 }
 
 enum class SecretKeys {

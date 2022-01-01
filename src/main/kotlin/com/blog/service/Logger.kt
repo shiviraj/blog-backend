@@ -10,13 +10,17 @@ class Logger {
 
         fun info(message: String, map: Map<String, Any>?) {
             print("Info: $message ")
-            print(map)
+            if (!map.isNullOrEmpty()) {
+                print(map)
+            }
             println()
         }
 
         fun error(message: String, map: Map<String, Any>?) {
             print("Error: $message ")
-            print(map)
+            if (!map.isNullOrEmpty()) {
+                print(map)
+            }
             println()
         }
     }

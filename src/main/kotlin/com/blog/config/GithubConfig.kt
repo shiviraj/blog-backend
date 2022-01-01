@@ -5,7 +5,7 @@ import org.springframework.boot.context.properties.ConstructorBinding
 
 @ConstructorBinding
 @ConfigurationProperties("blog.oauth")
-data class OAuthConfig(
+data class GithubConfig(
     val baseUrl: String,
     val accessTokenPath: String,
     val userBaseUrl: String,

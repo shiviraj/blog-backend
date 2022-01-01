@@ -1,11 +1,9 @@
 package com.blog.service
 
-import com.blog.domain.Role
-import com.blog.domain.Token
-import com.blog.domain.User
+import com.blog.domain.*
 import com.blog.repository.UserRepository
+import com.blog.security.UserId
 import com.blog.security.WebToken
-import com.blog.security.domain.UserToken
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.switchIfEmpty
@@ -17,21 +15,8 @@ class UserService(
     val webToken: WebToken
 ) {
 
-    fun getUserByToken(token: String): Mono<User> {
-        return userRepository.findByTokensToken(token)
-    }
-
-    fun getUserByUserToken(userToken: UserToken): Mono<User> {
-        return userRepository.findByUsername(userToken.username)
-    }
-
-    fun signInUserFromOauth(githubUser: GithubUser, githubUserEmail: GithubUserEmail): Mono<String> {
+    fun signInUserFromOauth(githubUser: GithubUser, githubUserEmail: GithubUserEmail): Mono<Pair<String, User>> {
         return userRepository.findByUsername(githubUser.username)
-            .flatMap {
-                if (it.userId.isEmpty() && it.role === Role.OWNER) {
-                    registerNewUser(it, githubUser, githubUserEmail)
-                } else Mono.just(it)
-            }
             .switchIfEmpty(
                 Mono.just(User(username = githubUser.username))
                     .flatMap {
@@ -39,11 +24,11 @@ class UserService(
                     }
             )
             .flatMap {
-                val token = webToken.generateToken(it.username, it.userId)
+                val token = webToken.generateToken(it)
                 it.tokens.add(Token(token))
                 userRepository.save(it)
-                    .map {
-                        token
+                    .map { user ->
+                        Pair(token, user)
                     }
                     .logOnSuccess("Successfully login user", mapOf("username" to githubUser.username))
             }
@@ -55,41 +40,40 @@ class UserService(
                 user.updateUser(userId, githubUser, githubUserEmail)
                 userRepository.save(user)
             }
-            .logOnSuccess("Successfully registered a new user", mapOf("user" to user))
-            .logOnError("Failed to register a new user")
+            .logOnSuccess("Successfully registered a new user", mapOf("user" to user.username))
+            .logOnError("Failed to register a new user", mapOf("user" to user.username))
     }
 
-    fun registerUser(user: User): Mono<User> {
-        return userRepository.findByUsername(user.username)
-            .switchIfEmpty {
-                userRepository.save(user)
-            }
-    }
-
-    fun logoutUser(userToken: UserToken): Mono<User> {
-        val token = webToken.generateToken(userToken)
-        return userRepository.findByUsername(userToken.username)
+    fun logoutUser(userId: UserId): Mono<User> {
+        return userRepository.findByUsername(userId.username)
             .flatMap { user ->
                 user.tokens.removeIf {
-                    it.token == token
+                    it.token == userId.token
                 }
                 userRepository.save(user)
             }
-            .logOnSuccess("Successfully logout user", mapOf("userToken" to userToken))
-            .logOnError("Failed to logout user", mapOf("userToken" to userToken))
+            .logOnSuccess("Successfully logout user", mapOf("user" to userId.userId))
+            .logOnError("Failed to logout user", mapOf("user" to userId.userId))
     }
 
-    fun getAllUsers(userToken: UserToken): Mono<List<User>> {
-        return userRepository.findByUsername(userToken.username)
+    fun getAllUsers(userId: UserId): Mono<List<User>> {
+        return Mono.just(userId)
             .flatMapMany {
-                if (it.role == Role.ADMIN) userRepository.findAllByRole(Role.USER)
+                if (userId.role == Role.ADMIN) userRepository.findAllByRole(Role.USER)
                 else userRepository.findAllByRoleIn(listOf(Role.USER, Role.ADMIN))
             }
             .collectList()
             .map {
                 it.sortedBy { user -> user.role }
             }
+            .logOnSuccess("Successfully fetched all user from db", mapOf("user" to userId.userId))
+            .logOnError("Failed to fetch user all from db", mapOf("user" to userId.userId))
     }
 
+    fun getUser(userId: UserId): Mono<User> {
+        return userRepository.findByUsername(userId.username)
+            .logOnSuccess("Successfully fetched user from db", mapOf("user" to userId.userId))
+            .logOnError("Failed to fetch user from db", mapOf("user" to userId.userId))
+    }
 }
 

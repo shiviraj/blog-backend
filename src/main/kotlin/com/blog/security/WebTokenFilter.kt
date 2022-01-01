@@ -1,7 +1,6 @@
 package com.blog.security
 
-import com.blog.security.domain.UserToken
-import com.blog.security.service.UserTokenService
+import org.springframework.http.HttpHeaders
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource
@@ -12,16 +11,13 @@ import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
 @Service
-class WebTokenFilter(
-    val userTokenService: UserTokenService,
-) :
-    OncePerRequestFilter() {
+class WebTokenFilter(private val webToken: WebToken) : OncePerRequestFilter() {
     override fun doFilterInternal(
         request: HttpServletRequest,
         response: HttpServletResponse,
         filterChain: FilterChain
     ) {
-        val token = request.getHeader("authorization")
+        val token = request.getHeader(HttpHeaders.AUTHORIZATION).orEmpty()
         userFilterChain(token.substringAfter(" "), request, filterChain, response)
     }
 
@@ -31,23 +27,31 @@ class WebTokenFilter(
         filterChain: FilterChain,
         response: HttpServletResponse
     ) {
-        val user = userTokenService.extractUser(token)
-        val userToken = userTokenService.extractUserToken(token)
-        if (userToken != null && user != null && isValidUser(userToken)) {
-            val authenticationToken = UsernamePasswordAuthenticationToken(user.username, null, emptyList())
+        if (AllowedPath.paths.contains(request.requestURI)) {
+            val authenticationToken = UsernamePasswordAuthenticationToken("uniqueId", "password", null)
             authenticationToken.details = WebAuthenticationDetailsSource().buildDetails(request)
             SecurityContextHolder.getContext().authentication = authenticationToken
-            request.setAttribute("user", userToken)
-            logger.info("Successfully validate user")
         } else {
-            SecurityContextHolder.getContext().authentication = null
-            logger.error("Failed to validate user")
+            val userAuthenticationData = webToken.getUserAuthenticationData(token)
+            if (SecurityContextHolder.getContext().authentication == null && userAuthenticationData.isValid()) {
+                val authenticationToken = UsernamePasswordAuthenticationToken(
+                    userAuthenticationData.uniqueId,
+                    "password",
+                    null
+                )
+                authenticationToken.details = WebAuthenticationDetailsSource().buildDetails(request)
+                SecurityContextHolder.getContext().authentication = authenticationToken
+                logger.info("Successfully validate user")
+                request.setAttribute(HttpHeaders.AUTHORIZATION, userAuthenticationData)
+            } else {
+                SecurityContextHolder.getContext().authentication = null
+                logger.error("Failed to validate user")
+            }
         }
         filterChain.doFilter(request, response)
     }
+}
 
-    private fun isValidUser(userToken: UserToken): Boolean {
-        val isAuthenticateNull = SecurityContextHolder.getContext().authentication == null
-        return isAuthenticateNull && userTokenService.validate(userToken)
-    }
+object AllowedPath {
+    val paths: List<String> = listOf("/oauth/client-id", "/oauth/sign-in/code")
 }

@@ -10,6 +10,16 @@ const val SECRETS_COLLECTION = "secrets"
 data class Secret(
     @Indexed(unique = true)
     val key: SecretKeys,
-    var value: String
-)
+    var value: String,
+    var encrypted: Boolean = true
+) {
+
+    fun decryptValue(decryptedValue: String): Secret {
+        if (encrypted) {
+            value = decryptedValue
+            encrypted = false
+        }
+        return this
+    }
+}
 

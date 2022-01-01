@@ -32,6 +32,8 @@ dependencies {
     implementation("bouncycastle:bcprov-jdk16:136")
     implementation("javax.xml.bind:jaxb-api:2.3.0")
 
+    compileOnly("org.projectlombok:lombok")
+    annotationProcessor("org.projectlombok:lombok")
     developmentOnly("org.springframework.boot:spring-boot-devtools:2.5.3")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test:2.5.3")

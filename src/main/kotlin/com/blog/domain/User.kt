@@ -1,8 +1,5 @@
 package com.blog.domain
 
-import com.blog.service.GithubUser
-import com.blog.service.GithubUserEmail
-import com.blog.service.LoginSource
 import org.bson.types.ObjectId
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.TypeAlias
@@ -47,6 +44,10 @@ enum class Role {
     USER,
     ADMIN,
     OWNER
+}
+
+enum class LoginSource {
+    GITHUB
 }
 
 data class Token(val token: String)

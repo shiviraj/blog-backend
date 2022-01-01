@@ -1,6 +1,7 @@
 package com.blog.security.crypto
 
 import com.blog.config.CryptoConfig
+import com.blog.service.Logger
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.bouncycastle.util.encoders.Base64
 import org.springframework.stereotype.Component
@@ -32,6 +33,7 @@ class Crypto(
                 return String(Base64.encode(cipherText))
             }
         } catch (e: Exception) {
+            Logger.error("Failed to encrypt", mapOf("value" to strToEncrypt))
             e.printStackTrace()
             return ""
         }
@@ -57,6 +59,7 @@ class Crypto(
             }
 
         } catch (e: Exception) {
+            Logger.error("Failed to decrypt", mapOf("value" to strToDecrypt))
             e.printStackTrace()
             return ""
         }
