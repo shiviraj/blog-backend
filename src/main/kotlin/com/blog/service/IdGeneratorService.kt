@@ -12,8 +12,8 @@ import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
 
 enum class IdType(val length: Int) {
-    DustbinId(8),
-    UserId(5)
+    UserId(5),
+    PageId(5),
 }
 
 @Service

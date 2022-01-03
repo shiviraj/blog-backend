@@ -1,7 +1,9 @@
 package com.blog.controller
 
 import com.blog.controller.view.AuthenticationResponse
+import com.blog.controller.view.UserView
 import com.blog.domain.Secret
+import com.blog.domain.User
 import com.blog.service.OauthService
 import com.blog.service.SecretKeys
 import com.blog.testUtils.assertNextWith
@@ -43,10 +45,11 @@ class OauthControllerTest {
 
     @Test
     fun `should sign in user by oauth`() {
-        every { oauthService.signIn(any()) } returns Mono.just("loggedIn")
+        val user = User(username = "username")
+        every { oauthService.signIn(any()) } returns Mono.just(Pair("loggedIn", user))
         val code = CodeRequest("code")
         assertNextWith(oauthController.signIn(code)) {
-            it shouldBe AuthenticationResponse("loggedIn")
+            it shouldBe AuthenticationResponse("loggedIn", UserView.from(user))
             verify(exactly = 1) {
                 oauthService.signIn(code)
             }
