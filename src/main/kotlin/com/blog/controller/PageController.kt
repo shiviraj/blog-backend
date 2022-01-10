@@ -1,7 +1,7 @@
 package com.blog.controller
 
 import com.blog.controller.view.PageView
-import com.blog.security.UserId
+import com.blog.domain.User
 import com.blog.service.PageService
 import org.springframework.web.bind.annotation.*
 import reactor.core.publisher.Mono
@@ -13,20 +13,20 @@ class PageController(
 ) {
 
     @PostMapping
-    fun addNewPage(userId: UserId): Mono<PageView> {
-        return pageService.addNewPage(userId)
+    fun addNewPage(user: User): Mono<PageView> {
+        return pageService.addNewPage(user)
             .map { PageView.from(it) }
     }
 
     @GetMapping("/{pageId}")
-    fun getPage(@PathVariable pageId: String, userId: UserId): Mono<PageView> {
-        return pageService.getPage(pageId, userId)
+    fun getPage(@PathVariable pageId: String, user: User): Mono<PageView> {
+        return pageService.getPage(pageId, user)
             .map { PageView.from(it) }
     }
 
     @PutMapping("/{pageId}")
-    fun updatePage(@PathVariable pageId: String, @RequestBody pageView: PageView, userId: UserId): Mono<PageView> {
-        return pageService.updatePage(pageId, pageView, userId)
+    fun updatePage(@PathVariable pageId: String, @RequestBody pageView: PageView, user: User): Mono<PageView> {
+        return pageService.updatePage(pageId, pageView, user)
             .map { PageView.from(it) }
     }
 }

@@ -1,6 +1,7 @@
 package com.blog.service
 
 import org.springframework.stereotype.Service
+import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.core.publisher.SignalType
 
@@ -34,6 +35,20 @@ fun <T> Mono<T>.logOnSuccess(message: String, map: Map<String, Any>? = null): Mo
 }
 
 fun <T> Mono<T>.logOnError(message: String, map: Map<String, Any>? = null): Mono<T> {
+    return doOnEach {
+        if (it.type == SignalType.ON_ERROR)
+            Logger.error(message, map)
+    }
+}
+
+fun <T> Flux<T>.logOnSuccess(message: String, map: Map<String, Any>? = null): Flux<T> {
+    return doOnEach {
+        if (it.type == SignalType.ON_ERROR)
+            Logger.error(message, map)
+    }
+}
+
+fun <T> Flux<T>.logOnError(message: String, map: Map<String, Any>? = null): Flux<T> {
     return doOnEach {
         if (it.type == SignalType.ON_ERROR)
             Logger.error(message, map)

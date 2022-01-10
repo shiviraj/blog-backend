@@ -14,6 +14,9 @@ import reactor.core.publisher.Mono
 enum class IdType(val length: Int) {
     UserId(5),
     PageId(5),
+    PostId(10),
+    CategoryId(3),
+    TagId(5)
 }
 
 @Service

@@ -31,6 +31,7 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("bouncycastle:bcprov-jdk16:136")
     implementation("javax.xml.bind:jaxb-api:2.3.0")
+    implementation("com.cloudinary:cloudinary-http44:1.29.0")
 
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")

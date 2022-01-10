@@ -48,7 +48,7 @@ class OauthServiceTest {
         every { githubGateway.getAccessTokens(any()) } returns Mono.just(accessTokenResponse)
         every { githubGateway.getUserProfile(any()) } returns Mono.just(githubUser)
         every { githubGateway.getUserEmail(any()) } returns Mono.just(githubUserEmail)
-        every { userService.signInUserFromOauth(any(), any()) } returns Mono.just("loggedIn")
+//        every { userService.signInUserFromOauth(any(), any()) } returns Mono.just("loggedIn")
 
         val signIn = oauthService.signIn(CodeRequest("code"))
 

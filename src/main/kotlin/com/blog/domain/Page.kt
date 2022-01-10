@@ -21,6 +21,7 @@ data class Page(
     val pageId: String,
     var url: String = "page",
     var content: Content = Content(),
+    var publishedContent: Content = Content(),
     var title: String = "page",
     var published: Boolean = false,
     val author: Author
@@ -42,7 +43,10 @@ data class Page(
         url = pageView.url
         title = pageView.title
         content = pageView.content
-        published = pageView.published
+        if (pageView.published) {
+            published = pageView.published
+            publishedContent = content
+        }
         return this
     }
 }

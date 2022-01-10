@@ -15,28 +15,27 @@ data class User(
     @Id
     var id: ObjectId? = null,
     @Indexed(unique = true)
-    var uniqueId: String = "",
-    var name: String = "",
-    var userId: String = "",
-    var email: String = "",
-    var emailVerified: Boolean = false,
-    var profile: String = "",
-    var location: String? = null,
-    var source: LoginSource? = null,
+    val uniqueId: String,
+    val name: String,
+    val userId: String,
+    val email: String,
+    val emailVerified: Boolean,
+    val profile: String,
+    val location: String?,
+    val source: LoginSource,
     val registeredAt: LocalDateTime = LocalDateTime.now(),
     val role: Role = Role.USER,
-    val tokens: MutableSet<Token> = mutableSetOf(),
-    val username: String
+    val username: String,
+    val tokens: MutableSet<Token> = mutableSetOf()
 ) {
-    fun updateUser(userId: String, githubUser: GithubUser, githubUserEmail: GithubUserEmail) {
-        this.uniqueId = githubUser.id.toString()
-        this.userId = userId
-        this.name = if (githubUser.name.isNullOrEmpty()) githubUser.username else githubUser.name
-        this.profile = githubUser.profile
-        this.email = githubUserEmail.email
-        this.emailVerified = githubUserEmail.verified
-        this.location = githubUser.location
-        this.source = githubUser.source
+    fun addToken(token: Token): User {
+        tokens.add(token)
+        return this
+    }
+
+    fun removeToken(token: Token): User {
+        tokens.removeIf { it == token }
+        return this
     }
 }
 
@@ -51,3 +50,7 @@ enum class LoginSource {
 }
 
 data class Token(val token: String)
+
+typealias Author = User
+typealias AuthorId = String
+typealias UserId = String

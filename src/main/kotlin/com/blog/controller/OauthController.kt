@@ -22,7 +22,7 @@ class OauthController(
     fun signIn(@RequestBody code: CodeRequest): Mono<AuthenticationResponse> {
         return oauthService.signIn(code)
             .map {
-                AuthenticationResponse(it.first, UserView.from(it.second))
+                AuthenticationResponse(it.first.token, UserView.from(it.second))
             }
     }
 }

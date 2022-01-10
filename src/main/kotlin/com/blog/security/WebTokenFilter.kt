@@ -1,5 +1,6 @@
 package com.blog.security
 
+import com.blog.service.UserService
 import org.springframework.http.HttpHeaders
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
@@ -11,7 +12,7 @@ import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
 @Service
-class WebTokenFilter(private val webToken: WebToken) : OncePerRequestFilter() {
+class WebTokenFilter(val webToken: WebToken, val userService: UserService) : OncePerRequestFilter() {
     override fun doFilterInternal(
         request: HttpServletRequest,
         response: HttpServletResponse,
@@ -42,7 +43,8 @@ class WebTokenFilter(private val webToken: WebToken) : OncePerRequestFilter() {
                 authenticationToken.details = WebAuthenticationDetailsSource().buildDetails(request)
                 SecurityContextHolder.getContext().authentication = authenticationToken
                 logger.info("Successfully validate user")
-                request.setAttribute(HttpHeaders.AUTHORIZATION, userAuthenticationData)
+                val user = userService.getUserByUserId(userAuthenticationData.userId).block()!!
+                request.setAttribute("user", user)
             } else {
                 SecurityContextHolder.getContext().authentication = null
                 logger.error("Failed to validate user")
