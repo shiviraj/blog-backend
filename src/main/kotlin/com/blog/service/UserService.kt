@@ -65,3 +65,4 @@ class UserService(
     private fun save(user: User) = userRepository.save(user)
 }
 
+typealias AuthorService = UserService

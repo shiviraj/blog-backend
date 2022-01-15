@@ -15,7 +15,6 @@ data class PostDetails(
     val tags: List<Tag>,
     val likes: Int,
     val disLikes: Int,
-    val comments: List<CommentDetails>
 ) {
     companion object {
         fun from(
@@ -23,7 +22,6 @@ data class PostDetails(
             author: Author,
             categories: List<Category>,
             tags: List<Tag>,
-            comments: List<CommentDetails>
         ):
             PostDetails {
             return PostDetails(
@@ -40,7 +38,6 @@ data class PostDetails(
                 tags = tags,
                 likes = post.likes.size,
                 disLikes = post.disLikes.size,
-                comments = comments,
                 commentsAllowed = post.commentsAllowed
             )
         }

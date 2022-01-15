@@ -9,6 +9,7 @@ data class UserView(
     val username: String,
     val name: String,
     val userId: String,
+    val profile: String
 ) {
     companion object {
         fun from(user: User): UserView {
@@ -16,6 +17,7 @@ data class UserView(
                 username = user.username,
                 name = user.name,
                 userId = user.userId,
+                profile = user.profile
             )
         }
     }

@@ -55,5 +55,5 @@ class WebTokenFilter(val webToken: WebToken, val userService: UserService) : Onc
 }
 
 object AllowedPath {
-    val paths: List<String> = listOf("/oauth/client-id", "/oauth/sign-in/code")
+    val paths: List<String> = listOf("/oauth/client-id", "/oauth/sign-in/code", "/posts/published/*")
 }

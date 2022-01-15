@@ -17,7 +17,7 @@ class WebSecurityConfig(
     override fun configure(http: HttpSecurity) {
         http.csrf().disable().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and().authorizeRequests()
-            .antMatchers("/oauth/client-id", "/oauth/sign-in/code").permitAll()
+            .antMatchers("/oauth/client-id", "/oauth/sign-in/code", "/posts/published/*").permitAll()
             .anyRequest().authenticated()
         http.addFilterBefore(webTokenFilter, UsernamePasswordAuthenticationFilter::class.java)
     }

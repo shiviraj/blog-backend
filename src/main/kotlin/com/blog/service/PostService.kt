@@ -59,9 +59,8 @@ class PostService(
         return Mono.zip(
             categoryService.getAllCategories(post.categories),
             tagService.getAllTags(post.tags),
-            commentService.getAllComments(post.postId)
         ).map {
-            PostDetails.from(post, author, it.t1, it.t2, it.t3)
+            PostDetails.from(post, author, it.t1, it.t2)
         }.logOnSuccess("Successfully get post details", mapOf("postId" to post.postId))
             .logOnError("Failed to get post details", mapOf("postId" to post.postId))
 

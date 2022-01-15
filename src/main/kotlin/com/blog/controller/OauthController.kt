@@ -1,7 +1,7 @@
 package com.blog.controller
 
 import com.blog.controller.view.AuthenticationResponse
-import com.blog.controller.view.UserView
+import com.blog.controller.view.AuthorView
 import com.blog.domain.Secret
 import com.blog.service.OauthService
 import org.springframework.web.bind.annotation.*
@@ -22,7 +22,7 @@ class OauthController(
     fun signIn(@RequestBody code: CodeRequest): Mono<AuthenticationResponse> {
         return oauthService.signIn(code)
             .map {
-                AuthenticationResponse(it.first.token, UserView.from(it.second))
+                AuthenticationResponse(it.first.token, AuthorView.from(it.second))
             }
     }
 }

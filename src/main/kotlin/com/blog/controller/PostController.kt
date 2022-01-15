@@ -47,5 +47,6 @@ class PostController(
     fun getMyPostCount(author: Author): Mono<Long> {
         return postService.getMyPostsCount(author)
     }
+
 }
 

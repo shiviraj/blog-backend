@@ -1,7 +1,6 @@
 package com.blog.controller
 
 import com.blog.controller.view.AuthenticationResponse
-import com.blog.controller.view.UserView
 import com.blog.domain.Secret
 import com.blog.domain.User
 import com.blog.service.OauthService
