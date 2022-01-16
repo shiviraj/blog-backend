@@ -1,5 +1,6 @@
 package com.blog.domain
 
+import com.blog.controller.LikeOrDislikeRequest
 import org.bson.types.ObjectId
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.TypeAlias
@@ -22,15 +23,38 @@ data class Comment(
     val status: CommentStatus = CommentStatus.UNAPPROVED,
     val commentedOn: LocalDateTime = LocalDateTime.now(),
     val parentComment: CommentId? = null,
-    val likes: List<UserId> = emptyList(),
-    val dislikes: List<UserId> = emptyList(),
+    val likes: MutableSet<UserId> = mutableSetOf(),
+    val dislikes: MutableSet<UserId> = mutableSetOf(),
     val pinned: Boolean = false
-)
+) {
+    fun updateLikeOrDislike(likeOrDislikeRequest: LikeOrDislikeRequest, userId: UserId): Comment {
+        when (likeOrDislikeRequest.action) {
+            Action.ADD_LIKE -> {
+                likes.add(userId)
+                dislikes.removeIf { it == userId }
+            }
+            Action.ADD_DISLIKE -> {
+                dislikes.add(userId)
+                likes.removeIf { it == userId }
+            }
+            Action.REMOVE_LIKE -> likes.removeIf { it == userId }
+            Action.REMOVE_DISLIKE -> dislikes.removeIf { it == userId }
+        }
+        return this
+    }
+}
 
 enum class CommentStatus {
     UNAPPROVED,
     APPROVED,
     TRASH
+}
+
+enum class Action {
+    ADD_LIKE,
+    ADD_DISLIKE,
+    REMOVE_LIKE,
+    REMOVE_DISLIKE
 }
 
 data class CommentDetails(
@@ -41,8 +65,8 @@ data class CommentDetails(
     val status: CommentStatus,
     val commentedOn: LocalDateTime,
     val parentComment: CommentId?,
-    val likes: List<UserId>,
-    val dislikes: List<UserId>,
+    val likes: Set<UserId>,
+    val dislikes: Set<UserId>,
     val pinned: Boolean
 ) {
     companion object {

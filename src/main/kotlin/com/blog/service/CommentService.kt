@@ -1,10 +1,8 @@
 package com.blog.service
 
+import com.blog.controller.LikeOrDislikeRequest
 import com.blog.controller.CommentRequest
-import com.blog.domain.Comment
-import com.blog.domain.CommentDetails
-import com.blog.domain.CommentStatus
-import com.blog.domain.PostId
+import com.blog.domain.*
 import com.blog.repository.CommentRepository
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
@@ -16,16 +14,24 @@ class CommentService(
     val commentRepository: CommentRepository,
     val userService: UserService
 ) {
-    fun getCommentsCount(postId: PostId): Mono<Int> {
-        return commentRepository.countAllByPostId(postId)
-            .switchIfEmpty(Mono.just(0))
+    fun likeOrDislikeOnComment(
+        commentId: CommentId,
+        likeOrDislikeRequest: LikeOrDislikeRequest,
+        user: User
+    ): Mono<CommentDetails> {
+        return commentRepository.findByCommentIdAndStatus(commentId)
+            .flatMap { comment ->
+                save(comment.updateLikeOrDislike(likeOrDislikeRequest, user.userId))
+            }.flatMap {
+                userService.getUserByUserId(it.userId)
+                    .map { user -> CommentDetails.from(it, user) }
+            }
     }
 
     fun getAllApprovedComments(postId: PostId): Flux<CommentDetails> {
         return commentRepository.findAllByPostIdAndStatusOrderByCommentedOnAsc(postId)
             .flatMap {
-                userService.getUserByUserId(it.userId)
-                    .map { user -> CommentDetails.from(it, user) }
+                userService.getUserByUserId(it.userId).map { user -> CommentDetails.from(it, user) }
             }
     }
 
@@ -51,5 +57,7 @@ class CommentService(
     private fun save(comment: Comment) = commentRepository.save(comment)
         .logOnSuccess("Successfully save comment in db", mapOf("commentId" to comment.commentId))
         .logOnError("Failed to save comment in db", mapOf("commentId" to comment.commentId))
+
+
 }
 

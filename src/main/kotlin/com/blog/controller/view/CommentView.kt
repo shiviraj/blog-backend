@@ -11,8 +11,8 @@ data class CommentView(
     val status: CommentStatus,
     val commentedOn: LocalDateTime,
     val parentComment: CommentId?,
-    val likes:  List<UserId>,
-    val dislikes:  List<UserId>,
+    val likes: Set<UserId>,
+    val dislikes: Set<UserId>,
     val pinned: Boolean
 ) {
     companion object {
