@@ -41,8 +41,8 @@ data class CommentDetails(
     val status: CommentStatus,
     val commentedOn: LocalDateTime,
     val parentComment: CommentId?,
-    val likes: Int,
-    val dislikes: Int,
+    val likes: List<UserId>,
+    val dislikes: List<UserId>,
     val pinned: Boolean
 ) {
     companion object {
@@ -55,8 +55,8 @@ data class CommentDetails(
                 status = comment.status,
                 commentedOn = comment.commentedOn,
                 parentComment = comment.parentComment,
-                likes = comment.likes.size,
-                dislikes = comment.dislikes.size,
+                likes = comment.likes,
+                dislikes = comment.dislikes,
                 pinned = comment.pinned
             )
         }

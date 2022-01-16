@@ -8,31 +8,31 @@ data class PostDetailsView(
     val title: String,
     val content: Content,
     val postDate: PostDate,
-    val author: AuthorView,
+    val author: AuthorId,
     val postStatus: PostStatus,
     val visibility: Visibility,
     val commentsAllowed: Boolean,
-    val categories: List<CategoryView>,
-    val tags: List<TagView>,
-    val likes: Int,
-    val disLikes: Int
+    val categories: List<CategoryId>,
+    val tags: List<TagId>,
+    val likes: List<UserId>,
+    val disLikes: List<UserId>,
 ) {
     companion object {
-        fun from(postDetails: PostDetails): PostDetailsView {
+        fun from(post: Post, isPublished: Boolean = false): PostDetailsView {
             return PostDetailsView(
-                postId = postDetails.postId,
-                url = postDetails.url,
-                content = postDetails.content,
-                title = postDetails.title,
-                postDate = postDetails.postDate,
-                author = AuthorView.from(postDetails.author),
-                tags = postDetails.tags.map { TagView.from(it) },
-                categories = postDetails.categories.map { CategoryView.from(it) },
-                postStatus = postDetails.postStatus,
-                visibility = postDetails.visibility,
-                likes = postDetails.likes,
-                disLikes = postDetails.disLikes,
-                commentsAllowed = postDetails.commentsAllowed
+                postId = post.postId,
+                url = post.url,
+                content = if (isPublished) post.publishedContent else post.content,
+                title = post.title,
+                postDate = post.postDate,
+                author = post.authorId,
+                tags = post.tags,
+                categories = post.categories,
+                postStatus = post.postStatus,
+                visibility = post.visibility,
+                likes = post.likes,
+                disLikes = post.disLikes,
+                commentsAllowed = post.commentsAllowed
             )
         }
     }

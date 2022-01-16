@@ -1,9 +1,6 @@
 package com.blog.controller.view
 
-import com.blog.domain.CommentDetails
-import com.blog.domain.CommentId
-import com.blog.domain.CommentStatus
-import com.blog.domain.PostId
+import com.blog.domain.*
 import java.time.LocalDateTime
 
 data class CommentView(
@@ -14,8 +11,8 @@ data class CommentView(
     val status: CommentStatus,
     val commentedOn: LocalDateTime,
     val parentComment: CommentId?,
-    val likes: Int,
-    val dislikes: Int,
+    val likes:  List<UserId>,
+    val dislikes:  List<UserId>,
     val pinned: Boolean
 ) {
     companion object {

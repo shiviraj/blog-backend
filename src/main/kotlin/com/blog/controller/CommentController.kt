@@ -10,15 +10,14 @@ import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
 @RestController
-@RequestMapping("/posts/comments")
+@RequestMapping("/comments")
 class CommentController(
     val commentService: CommentService
 ) {
 
     @GetMapping("/{postId}")
     fun getPostComments(@PathVariable postId: PostId): Flux<CommentView> {
-        return commentService.getAllApprovedComments(postId)
-            .map { CommentView.from(it) }
+        return commentService.getAllApprovedComments(postId).map { CommentView.from(it) }
     }
 
     @PostMapping("/{postId}")

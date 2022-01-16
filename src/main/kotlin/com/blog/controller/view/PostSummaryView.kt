@@ -6,31 +6,29 @@ data class PostSummaryView(
     val postId: PostId,
     val url: String,
     val title: String,
-    val postDate: PostDate = PostDate(),
-    val author: AuthorView,
+    val postDate: PostDate,
+    val author: AuthorId,
     val postStatus: PostStatus,
-    val visibility: Visibility = Visibility.PUBLIC,
-    val categories: List<CategoryView>,
-    val tags: List<TagView>,
-    val likes: Int,
-    val disLikes: Int,
-    val comments: Int
+    val visibility: Visibility,
+    val categories: List<CategoryId>,
+    val tags: List<TagId>,
+    val likes: List<UserId>,
+    val disLikes: List<UserId>,
 ) {
     companion object {
-        fun from(postSummary: PostSummary): PostSummaryView {
+        fun from(post: Post): PostSummaryView {
             return PostSummaryView(
-                postId = postSummary.postId,
-                url = postSummary.url,
-                title = postSummary.title,
-                postDate = postSummary.postDate,
-                author = AuthorView.from(postSummary.author),
-                tags = postSummary.tags.map { TagView.from(it) },
-                categories = postSummary.categories.map { CategoryView.from(it) },
-                postStatus = postSummary.postStatus,
-                visibility = postSummary.visibility,
-                likes = postSummary.likes,
-                disLikes = postSummary.disLikes,
-                comments = postSummary.comments
+                postId = post.postId,
+                url = post.url,
+                title = post.title,
+                postDate = post.postDate,
+                author = post.authorId,
+                tags = post.tags,
+                categories = post.categories,
+                postStatus = post.postStatus,
+                visibility = post.visibility,
+                likes = post.likes,
+                disLikes = post.disLikes,
             )
         }
     }

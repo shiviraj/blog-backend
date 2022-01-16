@@ -12,6 +12,7 @@ import reactor.core.publisher.Mono
 @Repository
 interface PostRepository : ReactiveCrudRepository<Post, String> {
     fun findByPostIdAndAuthorId(pageId: String, authorId: AuthorId): Mono<Post>
+    fun findByAuthorIdAndPostIdOrUrl(authorId: AuthorId, postIdOrUrl: String): Mono<Post>
     fun findAllByAuthorIdOrderByPostIdAsc(authorId: AuthorId, pageable: Pageable): Flux<Post>
     fun countAllByAuthorId(authorId: AuthorId): Mono<Long>
     fun findByUrlAndPostStatus(url: String, status: PostStatus = PostStatus.PUBLISH): Mono<Post>

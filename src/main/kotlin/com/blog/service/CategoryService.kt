@@ -24,8 +24,8 @@ class CategoryService(
         return categoryRepository.findAll()
     }
 
-    fun getAllCategories(categories: List<CategoryId>): Mono<List<Category>> {
-        return categoryRepository.findAllByCategoryIdIn(categories).collectList()
+    fun getAllCategories(categories: List<CategoryId>): Flux<Category> {
+        return categoryRepository.findAllByCategoryIdIn(categories)
     }
 
     private fun registerNewCategory(categoryRequest: CategoryRequest, author: Author): Mono<Category> {

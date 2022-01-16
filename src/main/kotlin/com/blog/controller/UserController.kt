@@ -3,9 +3,11 @@ package com.blog.controller
 import com.blog.controller.view.AuthorView
 import com.blog.controller.view.UserView
 import com.blog.domain.User
+import com.blog.domain.UserId
 import com.blog.service.UserService
 import org.springframework.http.HttpHeaders
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import reactor.core.publisher.Mono
@@ -16,10 +18,14 @@ import javax.servlet.http.HttpServletRequest
 class UserController(
     val userService: UserService
 ) {
-
     @GetMapping("/me")
     fun validateUser(user: User): Mono<AuthorView> {
         return Mono.just(AuthorView.from(user))
+    }
+
+    @GetMapping("/{userId}")
+    fun getUser(@PathVariable userId: UserId): Mono<UserView> {
+        return userService.getUserByUserId(userId).map { UserView.from(it) }
     }
 
     @GetMapping("/logout")

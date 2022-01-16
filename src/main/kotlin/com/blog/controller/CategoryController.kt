@@ -25,6 +25,11 @@ class CategoryController(
         return categoryService.addNewCategory(categoryRequest, author)
             .map { CategoryView.from(it) }
     }
+
+    @PostMapping("/categories")
+    fun getCategory(@RequestBody categories: List<CategoryId>): Flux<CategoryView> {
+        return categoryService.getAllCategories(categories).map { CategoryView.from(it) }
+    }
 }
 
 data class CategoryRequest(val name: String, val parentCategory: CategoryId? = null)

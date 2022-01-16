@@ -40,8 +40,8 @@ data class Post(
         title = postDetailsView.title
         commentsAllowed = postDetailsView.commentsAllowed
         content.update(postDetailsView.content)
-        tags.addAllUniq(postDetailsView.tags.map { it.tagId })
-        categories.addAllUniq(postDetailsView.categories.map { it.categoryId })
+        tags.addAllUniq(postDetailsView.tags)
+        categories.addAllUniq(postDetailsView.categories)
         if (postDetailsView.postStatus == PUBLISH) {
             postStatus = PUBLISH
             postDate.publish(postStatus)

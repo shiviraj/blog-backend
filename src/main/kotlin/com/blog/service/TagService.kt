@@ -8,6 +8,7 @@ import com.blog.exceptions.error_code.BlogError
 import com.blog.exceptions.exceptions.BadDataException
 import com.blog.repository.TagRepository
 import org.springframework.stereotype.Service
+import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
 @Service
@@ -16,8 +17,8 @@ class TagService(
     val tagRepository: TagRepository
 ) {
 
-    fun getAllTags(tags: List<TagId>): Mono<List<Tag>> {
-        return tagRepository.findAllByTagIdIn(tags).collectList()
+    fun getAllTags(tags: List<TagId>): Flux<Tag> {
+        return tagRepository.findAllByTagIdIn(tags)
     }
 
     fun addNewTag(tagRequest: TagRequest, author: Author): Mono<Tag> {

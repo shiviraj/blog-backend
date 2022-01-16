@@ -23,7 +23,6 @@ data class UserView(
     }
 }
 
-
 data class AuthorView(
     val username: String,
     val name: String,
