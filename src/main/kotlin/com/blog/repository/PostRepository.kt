@@ -2,6 +2,7 @@ package com.blog.repository
 
 import com.blog.domain.AuthorId
 import com.blog.domain.Post
+import com.blog.domain.PostId
 import com.blog.domain.PostStatus
 import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.reactive.ReactiveCrudRepository
@@ -16,4 +17,5 @@ interface PostRepository : ReactiveCrudRepository<Post, String> {
     fun findAllByAuthorIdOrderByPostIdAsc(authorId: AuthorId, pageable: Pageable): Flux<Post>
     fun countAllByAuthorId(authorId: AuthorId): Mono<Long>
     fun findByUrlAndPostStatus(url: String, status: PostStatus = PostStatus.PUBLISH): Mono<Post>
+    fun findByPostId(postId: PostId): Mono<Post>
 }

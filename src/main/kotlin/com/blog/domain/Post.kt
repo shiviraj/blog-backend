@@ -1,5 +1,6 @@
 package com.blog.domain
 
+import com.blog.controller.LikeOrDislikeRequest
 import com.blog.controller.view.PostDetailsView
 import com.blog.domain.PostStatus.DRAFT
 import com.blog.domain.PostStatus.PUBLISH
@@ -30,18 +31,18 @@ data class Post(
     val visibility: Visibility = PUBLIC,
     var postStatus: PostStatus = DRAFT,
     var commentsAllowed: Boolean = true,
-    val categories: MutableList<CategoryId> = mutableListOf(),
-    val tags: MutableList<TagId> = mutableListOf(),
-    val likes: MutableList<UserId> = mutableListOf(),
-    val disLikes: MutableList<UserId> = mutableListOf()
+    val categories: MutableSet<CategoryId> = mutableSetOf(),
+    val tags: MutableSet<TagId> = mutableSetOf(),
+    val likes: MutableSet<UserId> = mutableSetOf(),
+    val dislikes: MutableSet<UserId> = mutableSetOf()
 ) {
     fun update(postDetailsView: PostDetailsView): Post {
         url = postDetailsView.url
         title = postDetailsView.title
         commentsAllowed = postDetailsView.commentsAllowed
         content.update(postDetailsView.content)
-        tags.addAllUniq(postDetailsView.tags)
-        categories.addAllUniq(postDetailsView.categories)
+        tags.addAll(postDetailsView.tags)
+        categories.addAll(postDetailsView.categories)
         if (postDetailsView.postStatus == PUBLISH) {
             postStatus = PUBLISH
             postDate.publish(postStatus)
@@ -49,13 +50,22 @@ data class Post(
         }
         return this
     }
-}
 
-private fun <E> MutableList<E>.addAllUniq(list: List<E>): MutableList<E> {
-    list.map { item ->
-        if (!this.contains(item)) this.add(item)
+    fun updateLikeOrDislike(likeOrDislikeRequest: LikeOrDislikeRequest, userId: String): Post {
+        when (likeOrDislikeRequest.action) {
+            Action.ADD_LIKE -> {
+                likes.add(userId)
+                dislikes.removeIf { it == userId }
+            }
+            Action.ADD_DISLIKE -> {
+                dislikes.add(userId)
+                likes.removeIf { it == userId }
+            }
+            Action.REMOVE_LIKE -> likes.removeIf { it == userId }
+            Action.REMOVE_DISLIKE -> dislikes.removeIf { it == userId }
+        }
+        return this
     }
-    return this
 }
 
 data class PostDate(

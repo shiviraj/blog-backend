@@ -3,6 +3,8 @@ package com.blog.controller
 import com.blog.controller.view.PostDetailsView
 import com.blog.controller.view.PostSummaryView
 import com.blog.domain.Author
+import com.blog.domain.PostId
+import com.blog.domain.User
 import com.blog.service.PostService
 import org.springframework.web.bind.annotation.*
 import reactor.core.publisher.Flux
@@ -46,6 +48,15 @@ class PostController(
     @GetMapping("/{url}/published")
     fun getPost(@PathVariable url: String): Mono<PostDetailsView> {
         return postService.getPostDetails(url).map { PostDetailsView.from(it) }
+    }
+
+    @PutMapping("/{postId}/like-or-dislike")
+    fun addLikeOrDislikeOnComment(
+        @PathVariable postId: PostId,
+        @RequestBody likeOrDislikeRequest: LikeOrDislikeRequest,
+        user: User
+    ): Mono<PostDetailsView> {
+        return postService.likeOrDislikeOnComment(postId, likeOrDislikeRequest, user).map { PostDetailsView.from(it) }
     }
 }
 

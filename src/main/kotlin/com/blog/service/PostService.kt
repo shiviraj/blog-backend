@@ -1,8 +1,11 @@
 package com.blog.service
 
+import com.blog.controller.LikeOrDislikeRequest
 import com.blog.controller.view.PostDetailsView
 import com.blog.domain.Author
 import com.blog.domain.Post
+import com.blog.domain.PostId
+import com.blog.domain.User
 import com.blog.repository.PostRepository
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
@@ -49,7 +52,16 @@ class PostService(
         return postRepository.findByUrlAndPostStatus(url)
     }
 
-    private fun getPost(postId: String, author: Author) = postRepository.findByPostIdAndAuthorId(postId, author.userId)
+    fun likeOrDislikeOnComment(postId: PostId, likeOrDislikeRequest: LikeOrDislikeRequest, user: User): Mono<Post> {
+        return getPost(postId)
+            .flatMap {
+                save(it.updateLikeOrDislike(likeOrDislikeRequest, user.userId))
+            }
+    }
+
+    private fun getPost(postId: PostId, author: Author) = postRepository.findByPostIdAndAuthorId(postId, author.userId)
+    private fun getPost(postId: PostId) = postRepository.findByPostId(postId)
+
     private fun getPostByPostIdOrUrl(postIdOrUrl: String, author: Author): Mono<Post> {
         return postRepository.findByAuthorIdAndPostIdOrUrl(author.userId, postIdOrUrl)
     }

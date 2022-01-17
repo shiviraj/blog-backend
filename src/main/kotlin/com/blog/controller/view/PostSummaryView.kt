@@ -10,10 +10,10 @@ data class PostSummaryView(
     val author: AuthorId,
     val postStatus: PostStatus,
     val visibility: Visibility,
-    val categories: List<CategoryId>,
-    val tags: List<TagId>,
-    val likes: List<UserId>,
-    val disLikes: List<UserId>,
+    val categories: Set<CategoryId>,
+    val tags: Set<TagId>,
+    val likes: Set<UserId>,
+    val dislikes: Set<UserId>,
 ) {
     companion object {
         fun from(post: Post): PostSummaryView {
@@ -28,7 +28,7 @@ data class PostSummaryView(
                 postStatus = post.postStatus,
                 visibility = post.visibility,
                 likes = post.likes,
-                disLikes = post.disLikes,
+                dislikes = post.dislikes,
             )
         }
     }
