@@ -6,7 +6,6 @@ import org.springframework.boot.context.properties.ConfigurationPropertiesScan
 import org.springframework.data.mongodb.config.EnableMongoAuditing
 import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.transaction.annotation.EnableTransactionManagement
-import java.util.*
 
 @SpringBootApplication
 @EnableMongoAuditing
@@ -17,9 +16,7 @@ class BlogApplication {
     companion object {
         @JvmStatic
         fun main(args: Array<String>) {
-            val properties = Properties()
-            properties["spring.data.mongodb.uri"] = System.getenv("MONGODB_URL")
-            SpringApplicationBuilder(BlogApplication::class.java).properties(properties).run(*args)
+            SpringApplicationBuilder(BlogApplication::class.java).run(*args)
         }
     }
 }

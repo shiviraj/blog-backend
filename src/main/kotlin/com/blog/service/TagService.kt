@@ -44,5 +44,9 @@ class TagService(
     private fun save(tag: Tag) = tagRepository.save(tag)
         .logOnSuccess("Successfully updated tag in db", mapOf("tagId" to tag.tagId))
         .logOnError("failed to update tag in db", mapOf("tagId" to tag.tagId))
+
+    fun getAllTagsByTagName(tagName: String): Flux<Tag> {
+        return tagRepository.findTagsByTagName(tagName)
+    }
 }
 

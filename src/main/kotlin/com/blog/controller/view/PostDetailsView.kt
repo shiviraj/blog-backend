@@ -21,18 +21,18 @@ data class PostDetailsView(
         fun from(post: Post, isPublished: Boolean = false): PostDetailsView {
             return PostDetailsView(
                 postId = post.postId,
-                url = post.url,
+                url = post.getUrl(),
                 content = if (isPublished) post.publishedContent else post.content,
-                title = post.title,
+                title = post.getTitle(),
                 postDate = post.postDate,
                 author = post.authorId,
                 tags = post.tags,
                 categories = post.categories,
-                postStatus = post.postStatus,
+                postStatus = post.getStatus(),
                 visibility = post.visibility,
                 likes = post.likes,
                 dislikes = post.dislikes,
-                commentsAllowed = post.commentsAllowed
+                commentsAllowed = post.isCommentsAllowed()
             )
         }
     }

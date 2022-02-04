@@ -18,19 +18,19 @@ const val POST_COLLECTION = "posts"
 @Document(POST_COLLECTION)
 data class Post(
     @Id
-    var id: ObjectId? = null,
+    private var id: ObjectId? = null,
     @Indexed(unique = true)
     val postId: PostId,
     @Indexed(unique = true)
-    var url: String = postId,
-    var title: String = "Add new post",
+    private var url: String = postId,
+    private var title: String = "Add new post",
     val content: Content = Content(),
     val publishedContent: Content = content,
     val postDate: PostDate = PostDate(),
     val authorId: AuthorId,
     val visibility: Visibility = PUBLIC,
-    var postStatus: PostStatus = DRAFT,
-    var commentsAllowed: Boolean = true,
+    private var postStatus: PostStatus = DRAFT,
+    private var commentsAllowed: Boolean = true,
     val categories: MutableSet<CategoryId> = mutableSetOf(),
     val tags: MutableSet<TagId> = mutableSetOf(),
     val likes: MutableSet<UserId> = mutableSetOf(),
@@ -40,13 +40,14 @@ data class Post(
         url = postDetailsView.url
         title = postDetailsView.title
         commentsAllowed = postDetailsView.commentsAllowed
-        content.update(postDetailsView.content)
         tags.addAll(postDetailsView.tags)
         categories.addAll(postDetailsView.categories)
         if (postDetailsView.postStatus == PUBLISH) {
             postStatus = PUBLISH
             postDate.publish(postStatus)
             publishedContent.update(content)
+        } else {
+            content.update(postDetailsView.content)
         }
         return this
     }
@@ -66,11 +67,16 @@ data class Post(
         }
         return this
     }
+
+    fun getUrl() = this.url
+    fun getTitle() = this.title
+    fun getStatus() = this.postStatus
+    fun isCommentsAllowed() = this.commentsAllowed
 }
 
 data class PostDate(
-    var publishedOn: LocalDateTime? = null,
-    var lastUpdateOn: LocalDateTime = LocalDateTime.now(),
+    private var publishedOn: LocalDateTime? = null,
+    private var lastUpdateOn: LocalDateTime = LocalDateTime.now(),
     val createdAt: LocalDateTime = LocalDateTime.now()
 ) {
     fun publish(postStatus: PostStatus) {

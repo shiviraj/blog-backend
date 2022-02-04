@@ -22,8 +22,13 @@ class PostController(
     }
 
     @GetMapping("/{postId}")
-    fun getPost(@PathVariable postId: String, author: Author): Mono<PostDetailsView> {
+    fun getPost(@PathVariable postId: PostId, author: Author): Mono<PostDetailsView> {
         return postService.getPostDetails(postId, author).map { PostDetailsView.from(it) }
+    }
+
+    @GetMapping("/{postId}/url-available/{url}")
+    fun isUrlAvailable(@PathVariable postId: PostId, @PathVariable url: String, author: Author): Mono<Boolean> {
+        return postService.isUrlAvailable(postId, url, author)
     }
 
     @PutMapping("/{postId}")

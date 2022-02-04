@@ -4,10 +4,7 @@ import com.blog.controller.view.TagView
 import com.blog.domain.Author
 import com.blog.domain.TagId
 import com.blog.service.TagService
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
@@ -24,6 +21,11 @@ class TagController(
     @PostMapping("/tags")
     fun getAllTag(@RequestBody tags: List<TagId>): Flux<TagView> {
         return tagService.getAllTags(tags).map { TagView.from(it) }
+    }
+
+    @GetMapping("/{tagName}")
+    fun getTagsByTagName(@PathVariable tagName: String): Flux<TagView> {
+        return tagService.getAllTagsByTagName(tagName).map { TagView.from(it) }
     }
 }
 

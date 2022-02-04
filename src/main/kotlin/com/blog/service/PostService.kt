@@ -24,8 +24,8 @@ class PostService(
             .logOnError("failed to add new post", mapOf("author" to author.username))
     }
 
-    fun getPostDetails(postIdOrUrl: String, author: Author): Mono<Post> {
-        return getPostByPostIdOrUrl(postIdOrUrl, author)
+    fun getPostDetails(postId: PostId, author: Author): Mono<Post> {
+        return getPostByPostId(postId, author)
     }
 
     fun updatePost(postId: String, postDetailsView: PostDetailsView, author: Author): Mono<Post> {
@@ -59,11 +59,21 @@ class PostService(
             }
     }
 
+    fun isUrlAvailable(postId: PostId, url: String, author: Author): Mono<Boolean> {
+        return getPostByUrl(url, author).map { it.postId == postId }
+            .switchIfEmpty(Mono.just(true))
+    }
+
     private fun getPost(postId: PostId, author: Author) = postRepository.findByPostIdAndAuthorId(postId, author.userId)
+
     private fun getPost(postId: PostId) = postRepository.findByPostId(postId)
 
-    private fun getPostByPostIdOrUrl(postIdOrUrl: String, author: Author): Mono<Post> {
-        return postRepository.findByAuthorIdAndPostIdOrUrl(author.userId, postIdOrUrl)
+    private fun getPostByUrl(postUrl: String, author: Author): Mono<Post> {
+        return postRepository.findByAuthorIdAndUrl(author.userId, postUrl)
+    }
+
+    private fun getPostByPostId(postId: PostId, author: Author): Mono<Post> {
+        return postRepository.findByPostIdAndAuthorId(postId, author.userId)
     }
 
     private fun save(post: Post) = postRepository.save(post)

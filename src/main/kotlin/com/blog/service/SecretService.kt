@@ -1,6 +1,8 @@
 package com.blog.service
 
 import com.blog.domain.Secret
+import com.blog.exceptions.error_code.BlogError
+import com.blog.exceptions.exceptions.DataNotFound
 import com.blog.repository.SecretRepository
 import com.blog.security.crypto.Crypto
 import org.springframework.stereotype.Service
@@ -21,6 +23,7 @@ class SecretService(private val secretRepository: SecretRepository, private val 
             .map {
                 it.decryptValue(crypto.decrypt(it.value))
             }
+            .switchIfEmpty(Mono.error(DataNotFound(BlogError.BLOG604)))
     }
 }
 

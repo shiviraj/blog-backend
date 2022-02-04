@@ -19,13 +19,13 @@ data class PostSummaryView(
         fun from(post: Post): PostSummaryView {
             return PostSummaryView(
                 postId = post.postId,
-                url = post.url,
-                title = post.title,
+                url = post.getUrl(),
+                title = post.getTitle(),
                 postDate = post.postDate,
                 author = post.authorId,
                 tags = post.tags,
                 categories = post.categories,
-                postStatus = post.postStatus,
+                postStatus = post.getStatus(),
                 visibility = post.visibility,
                 likes = post.likes,
                 dislikes = post.dislikes,
