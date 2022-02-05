@@ -11,6 +11,11 @@ data class Content(
         blocks = content.blocks
         return this
     }
+
+    fun getTruncateContent(): String {
+        val content = blocks.filter { it.type == "paragraph" }.joinToString { it.data["text"] as String }
+        return content.substring(0, content.length.coerceAtMost(500))
+    }
 }
 
 data class Block(

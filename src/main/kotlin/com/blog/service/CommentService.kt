@@ -1,7 +1,7 @@
 package com.blog.service
 
-import com.blog.controller.LikeOrDislikeRequest
 import com.blog.controller.CommentRequest
+import com.blog.controller.LikeOrDislikeRequest
 import com.blog.domain.*
 import com.blog.repository.CommentRepository
 import org.springframework.stereotype.Service
@@ -53,6 +53,8 @@ class CommentService(
                     .map { user -> CommentDetails.from(it, user) }
             }
     }
+
+    fun countAllComments(postId: PostId) = commentRepository.countAllByPostId(postId)
 
     private fun save(comment: Comment) = commentRepository.save(comment)
         .logOnSuccess("Successfully save comment in db", mapOf("commentId" to comment.commentId))

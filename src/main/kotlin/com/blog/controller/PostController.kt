@@ -42,7 +42,9 @@ class PostController(
 
     @GetMapping("/my-posts/page/{page}/limit/{limit}")
     fun getMyPost(@PathVariable limit: Int, @PathVariable page: Int, author: Author): Flux<PostSummaryView> {
-        return postService.getMyAllPosts(page, limit, author).map { PostSummaryView.from(it) }
+        return postService.getMyAllPosts(page, limit, author).map {
+            PostSummaryView.from(it.t1, it.t2, it.t3, it.t4, it.t5)
+        }
     }
 
     @GetMapping("/my-posts/count")
@@ -63,5 +65,18 @@ class PostController(
     ): Mono<PostDetailsView> {
         return postService.likeOrDislikeOnComment(postId, likeOrDislikeRequest, user).map { PostDetailsView.from(it) }
     }
+
+    @GetMapping("/page/{page}")
+    fun getPosts(@PathVariable page: Int): Flux<PostSummaryView> {
+        return postService.getAllPosts(page).map {
+            PostSummaryView.from(it.t1, it.t2, it.t3, it.t4, it.t5)
+        }
+    }
+
+    @GetMapping("/count")
+    fun getSidebar(): Mono<Long> {
+        return postService.getPostsCount()
+    }
+
 }
 

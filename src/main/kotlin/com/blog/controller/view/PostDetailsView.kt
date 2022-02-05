@@ -1,13 +1,17 @@
 package com.blog.controller.view
 
 import com.blog.domain.*
+import java.time.LocalDateTime
 
 data class PostDetailsView(
     val postId: PostId,
     val url: String,
     val title: String,
     val content: Content,
-    val postDate: PostDate,
+    val createdAt: LocalDateTime,
+    val lastUpdatedAt: LocalDateTime,
+    val publishedOn: LocalDateTime?,
+    val featuredImage: String?,
     val author: AuthorId,
     val postStatus: PostStatus,
     val visibility: Visibility,
@@ -24,7 +28,6 @@ data class PostDetailsView(
                 url = post.getUrl(),
                 content = if (isPublished) post.publishedContent else post.content,
                 title = post.getTitle(),
-                postDate = post.postDate,
                 author = post.authorId,
                 tags = post.tags,
                 categories = post.categories,
@@ -32,7 +35,11 @@ data class PostDetailsView(
                 visibility = post.getVisibility(),
                 likes = post.likes,
                 dislikes = post.dislikes,
-                commentsAllowed = post.isCommentsAllowed()
+                commentsAllowed = post.isCommentsAllowed(),
+                createdAt = post.createdAt,
+                lastUpdatedAt = post.getLastUpdateOn(),
+                publishedOn = post.getPublishedOn(),
+                featuredImage = post.getFeaturedImage()
             )
         }
     }

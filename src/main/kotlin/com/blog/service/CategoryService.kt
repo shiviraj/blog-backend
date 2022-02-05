@@ -13,7 +13,7 @@ import java.util.*
 @Service
 class CategoryService(
     val idGeneratorService: IdGeneratorService,
-    val categoryRepository: CategoryRepository
+    val categoryRepository: CategoryRepository,
 ) {
     fun addNewCategory(categoryRequest: CategoryRequest, author: Author): Mono<Category> {
         return categoryRepository.findByName(categoryRequest.name)
@@ -50,5 +50,7 @@ class CategoryService(
     private fun save(category: Category) = categoryRepository.save(category)
         .logOnSuccess("Successfully updated category in db", mapOf("categoryId" to category.categoryId))
         .logOnError("failed to update category in db", mapOf("categoryId" to category.categoryId))
+
+    fun findByUrl(categoryUrl: String) = categoryRepository.findByUrl(categoryUrl)
 }
 

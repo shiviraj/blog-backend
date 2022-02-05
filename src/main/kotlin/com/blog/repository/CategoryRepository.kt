@@ -12,5 +12,6 @@ interface CategoryRepository : ReactiveCrudRepository<Category, String> {
     fun findAllByCategoryIdIn(categoryIds: List<CategoryId>): Flux<Category>
     fun findByName(name: String): Mono<Category>
     fun findByCategoryId(categoryId: CategoryId): Mono<Category>
+    fun findByUrl(url: String): Mono<Category>
     fun existsByCategoryId(categoryId: CategoryId?): Mono<Boolean>
 }

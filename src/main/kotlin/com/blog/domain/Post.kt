@@ -26,7 +26,9 @@ data class Post(
     private var title: String = "Add new post",
     val content: Content = Content(),
     val publishedContent: Content = content,
-    val postDate: PostDate = PostDate(),
+    private var publishedOn: LocalDateTime? = null,
+    private var lastUpdateOn: LocalDateTime = LocalDateTime.now(),
+    val createdAt: LocalDateTime = LocalDateTime.now(),
     val authorId: AuthorId,
     private var visibility: Visibility = PUBLIC,
     private var postStatus: PostStatus = DRAFT,
@@ -34,17 +36,20 @@ data class Post(
     val categories: MutableSet<CategoryId> = mutableSetOf(),
     val tags: MutableSet<TagId> = mutableSetOf(),
     val likes: MutableSet<UserId> = mutableSetOf(),
-    val dislikes: MutableSet<UserId> = mutableSetOf()
+    val dislikes: MutableSet<UserId> = mutableSetOf(),
+    private var featuredImage: String? = null
 ) {
     fun update(postDetailsView: PostDetailsView): Post {
         url = postDetailsView.url
         title = postDetailsView.title
         commentsAllowed = postDetailsView.commentsAllowed
         visibility = postDetailsView.visibility
+        lastUpdateOn = LocalDateTime.now()
+        featuredImage = postDetailsView.featuredImage
         updateTagsAndCategories(postDetailsView)
         if (postDetailsView.postStatus == PUBLISH) {
             postStatus = PUBLISH
-            postDate.publish(postStatus)
+            publishedOn = LocalDateTime.now()
             publishedContent.update(content)
         } else {
             content.update(postDetailsView.content)
@@ -73,25 +78,15 @@ data class Post(
     fun getStatus() = this.postStatus
     fun isCommentsAllowed() = this.commentsAllowed
     fun getVisibility() = this.visibility
+    fun getLastUpdateOn() = this.lastUpdateOn
+    fun getPublishedOn() = this.publishedOn
+    fun getFeaturedImage() = this.featuredImage
 
     private fun updateTagsAndCategories(postDetailsView: PostDetailsView) {
         tags.removeAll(tags)
         categories.removeAll(categories)
         tags.addAll(postDetailsView.tags)
         categories.addAll(postDetailsView.categories)
-    }
-}
-
-data class PostDate(
-    private var publishedOn: LocalDateTime? = null,
-    private var lastUpdateOn: LocalDateTime = LocalDateTime.now(),
-    val createdAt: LocalDateTime = LocalDateTime.now()
-) {
-    fun publish(postStatus: PostStatus) {
-        if (postStatus == DRAFT) {
-            publishedOn = LocalDateTime.now()
-        }
-        lastUpdateOn = LocalDateTime.now()
     }
 }
 
@@ -103,7 +98,9 @@ enum class PostStatus {
 
 enum class Visibility {
     PUBLIC,
-    PRIVATE
+    PRIVATE;
+
+    fun isPublic() = this == PUBLIC
 }
 
 typealias PostId = String

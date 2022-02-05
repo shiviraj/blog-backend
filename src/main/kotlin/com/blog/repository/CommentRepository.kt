@@ -16,5 +16,7 @@ interface CommentRepository : ReactiveCrudRepository<Comment, String> {
         status: CommentStatus = CommentStatus.APPROVED
     ): Flux<Comment>
 
+    fun countAllByPostId(postId: PostId): Mono<Long>
+
     fun findByCommentIdAndStatus(commentId: CommentId, status: CommentStatus = CommentStatus.APPROVED): Mono<Comment>
 }
