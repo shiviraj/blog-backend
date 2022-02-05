@@ -26,7 +26,7 @@ data class PostSummaryView(
                 tags = post.tags,
                 categories = post.categories,
                 postStatus = post.getStatus(),
-                visibility = post.visibility,
+                visibility = post.getVisibility(),
                 likes = post.likes,
                 dislikes = post.dislikes,
             )

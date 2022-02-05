@@ -28,7 +28,7 @@ data class Post(
     val publishedContent: Content = content,
     val postDate: PostDate = PostDate(),
     val authorId: AuthorId,
-    val visibility: Visibility = PUBLIC,
+    private var visibility: Visibility = PUBLIC,
     private var postStatus: PostStatus = DRAFT,
     private var commentsAllowed: Boolean = true,
     val categories: MutableSet<CategoryId> = mutableSetOf(),
@@ -40,8 +40,8 @@ data class Post(
         url = postDetailsView.url
         title = postDetailsView.title
         commentsAllowed = postDetailsView.commentsAllowed
-        tags.addAll(postDetailsView.tags)
-        categories.addAll(postDetailsView.categories)
+        visibility = postDetailsView.visibility
+        updateTagsAndCategories(postDetailsView)
         if (postDetailsView.postStatus == PUBLISH) {
             postStatus = PUBLISH
             postDate.publish(postStatus)
@@ -72,6 +72,14 @@ data class Post(
     fun getTitle() = this.title
     fun getStatus() = this.postStatus
     fun isCommentsAllowed() = this.commentsAllowed
+    fun getVisibility() = this.visibility
+
+    private fun updateTagsAndCategories(postDetailsView: PostDetailsView) {
+        tags.removeAll(tags)
+        categories.removeAll(categories)
+        tags.addAll(postDetailsView.tags)
+        categories.addAll(postDetailsView.categories)
+    }
 }
 
 data class PostDate(
