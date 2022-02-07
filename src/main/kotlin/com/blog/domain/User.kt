@@ -26,30 +26,36 @@ data class User(
     val registeredAt: LocalDateTime = LocalDateTime.now(),
     val role: Role = Role.USER,
     val username: String,
-    val tokens: MutableSet<Token> = mutableSetOf()
 ) {
-    fun addToken(token: Token): User {
-        tokens.add(token)
-        return this
-    }
-
-    fun removeToken(token: Token): User {
-        tokens.removeIf { it == token }
-        return this
+    companion object {
+        fun createDummy(userId: UserId): User {
+            return User(
+                uniqueId = "unique",
+                name = "Dummy",
+                userId = userId,
+                email = "email",
+                emailVerified = false,
+                profile = "",
+                location = null,
+                source = LoginSource.DUMMY,
+                role = Role.DUMMY,
+                username = "dummy"
+            )
+        }
     }
 }
 
 enum class Role {
+    DUMMY,
     USER,
     ADMIN,
     OWNER
 }
 
 enum class LoginSource {
+    DUMMY,
     GITHUB
 }
-
-data class Token(val token: String)
 
 typealias Author = User
 typealias AuthorId = String

@@ -1,9 +1,11 @@
 package com.blog.controller
 
+import com.blog.controller.view.AuthenticationResponse
 import com.blog.controller.view.AuthorView
 import com.blog.controller.view.UserView
 import com.blog.domain.User
 import com.blog.domain.UserId
+import com.blog.service.TokenService
 import com.blog.service.UserService
 import org.springframework.http.HttpHeaders
 import org.springframework.web.bind.annotation.GetMapping
@@ -16,11 +18,19 @@ import javax.servlet.http.HttpServletRequest
 @RestController
 @RequestMapping("/users")
 class UserController(
-    val userService: UserService
+    val userService: UserService,
+    val tokenService: TokenService
 ) {
     @GetMapping("/me")
     fun validateUser(user: User): Mono<AuthorView> {
         return Mono.just(AuthorView.from(user))
+    }
+
+    @GetMapping("/dummy")
+    fun getDummyUser(): Mono<AuthenticationResponse> {
+        return userService.getDummyUser().map {
+            AuthenticationResponse(it.first.getValue(), AuthorView.from(it.second))
+        }
     }
 
     @GetMapping("/{userId}")
@@ -30,9 +40,9 @@ class UserController(
 
     @GetMapping("/logout")
     fun logoutUser(request: HttpServletRequest, user: User): Mono<UserView> {
-        val token = request.getHeader(HttpHeaders.AUTHORIZATION).substringAfter(" ")
-        return userService.logoutUser(user, token)
-            .map { UserView.from(it) }
+        val authorization = request.getHeader(HttpHeaders.AUTHORIZATION) as String
+        return tokenService.logoutUser(authorization.substringAfter(" "))
+            .map { UserView.from(user) }
     }
 }
 

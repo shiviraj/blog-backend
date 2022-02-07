@@ -5,7 +5,6 @@ import com.blog.domain.GithubUserEmail
 import com.blog.domain.Token
 import com.blog.domain.User
 import com.blog.repository.UserRepository
-import com.blog.security.WebToken
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
 
@@ -13,20 +12,12 @@ import reactor.core.publisher.Mono
 class UserService(
     val userRepository: UserRepository,
     val idGeneratorService: IdGeneratorService,
-    val webToken: WebToken
+    val tokenService: TokenService
 ) {
 
-    fun signInUserFromOauth(githubUser: GithubUser, githubUserEmail: GithubUserEmail): Mono<Pair<Token, User>> {
+    fun signInUserFromOauth(githubUser: GithubUser, githubUserEmail: GithubUserEmail): Mono<User> {
         return userRepository.findByUsername(githubUser.username)
             .switchIfEmpty(registerNewUser(githubUser, githubUserEmail))
-            .flatMap {
-                val token = webToken.generateToken(it)
-                save(it.addToken(token))
-                    .map { user ->
-                        Pair(token, user)
-                    }
-                    .logOnSuccess("Successfully login user", mapOf("username" to githubUser.username))
-            }
     }
 
     private fun registerNewUser(githubUser: GithubUser, githubUserEmail: GithubUserEmail): Mono<User> {
@@ -50,12 +41,6 @@ class UserService(
             .logOnError("Failed to register a new user", mapOf("user" to githubUser.username))
     }
 
-    fun logoutUser(user: User, token: String): Mono<User> {
-        return save(user.removeToken(Token(token)))
-            .logOnSuccess("Successfully logout user", mapOf("user" to user.userId))
-            .logOnError("Failed to logout user", mapOf("user" to user.userId))
-    }
-
     fun getUserByUserId(userId: String): Mono<User> {
         return userRepository.findByUserId(userId)
             .logOnSuccess("Successfully fetched user from db", mapOf("user" to userId))
@@ -63,6 +48,24 @@ class UserService(
     }
 
     private fun save(user: User) = userRepository.save(user)
+    fun extractUser(token: String): Mono<User> {
+        return tokenService.extractToken(token)
+            .flatMap {
+                if (it.userType.isDummy()) {
+                    Mono.just(User.createDummy(it.userId))
+                } else {
+                    userRepository.findByUserId(it.userId)
+                }
+            }.logOnSuccess("Successfully fetched user from token")
+            .logOnError("Failed to fetch user from token")
+    }
+
+    fun getDummyUser(): Mono<Pair<Token, User>> {
+        return idGeneratorService.generateId(IdType.DummyUserId).flatMap { userId ->
+            val user = User.createDummy(userId)
+            tokenService.generateToken(user).map { Pair(it, user) }
+        }
+    }
 }
 
 typealias AuthorService = UserService

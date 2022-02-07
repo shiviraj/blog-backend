@@ -9,5 +9,6 @@ enum class BlogError(override val errorCode: String, override val message: Strin
     BLOG602("BLOG-602", "Failed to fetch user email from github"),
     BLOG603("BLOG-603", "Bad request"),
     BLOG604("BLOG-604", "Secret Not Found"),
-    BLOG605("BLOG-605", "Post Not Found")
+    BLOG605("BLOG-605", "Post Not Found"),
+    BLOG606("BLOG-606", "Unauthorized User")
 }

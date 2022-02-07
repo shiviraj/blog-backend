@@ -12,7 +12,8 @@ import reactor.core.publisher.Mono
 class OauthService(
     val userService: UserService,
     val secretService: SecretService,
-    val githubGateway: GithubGateway
+    val githubGateway: GithubGateway,
+    val tokenService: TokenService
 ) {
     fun getClientId(): Mono<Secret> {
         return secretService.getClientId()
@@ -21,15 +22,17 @@ class OauthService(
     }
 
     fun signIn(code: CodeRequest): Mono<Pair<Token, User>> {
-        return githubGateway.getAccessTokens(code.code)
-            .flatMap {
-                Mono.zip(
-                    githubGateway.getUserProfile(it),
-                    githubGateway.getUserEmail(it)
-                )
+        return githubGateway.getAccessTokens(code.code).flatMap {
+            Mono.zip(
+                githubGateway.getUserProfile(it),
+                githubGateway.getUserEmail(it)
+            )
+        }.flatMap {
+            userService.signInUserFromOauth(it.t1, it.t2)
+        }.flatMap { user ->
+            tokenService.generateToken(user).map {
+                Pair(it, user)
             }
-            .flatMap {
-                userService.signInUserFromOauth(it.t1, it.t2)
-            }
+        }
     }
 }
