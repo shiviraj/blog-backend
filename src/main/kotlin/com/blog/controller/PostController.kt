@@ -4,7 +4,9 @@ import com.blog.controller.view.PostDetailsView
 import com.blog.controller.view.PostSummaryView
 import com.blog.domain.Author
 import com.blog.domain.PostId
+import com.blog.domain.Role
 import com.blog.domain.User
+import com.blog.security.authorization.Authorization
 import com.blog.service.PostService
 import org.springframework.web.bind.annotation.*
 import reactor.core.publisher.Flux
@@ -16,21 +18,25 @@ class PostController(
     val postService: PostService
 ) {
 
+    @Authorization(Role.USER)
     @PostMapping
     fun addNewPost(author: Author): Mono<PostDetailsView> {
         return postService.addNewPost(author).map { PostDetailsView.from(it) }
     }
 
+    @Authorization(Role.USER)
     @GetMapping("/{postId}")
     fun getPost(@PathVariable postId: PostId, author: Author): Mono<PostDetailsView> {
         return postService.getPostDetails(postId, author).map { PostDetailsView.from(it) }
     }
 
+    @Authorization(Role.USER)
     @GetMapping("/{postId}/url-available/{url}")
     fun isUrlAvailable(@PathVariable postId: PostId, @PathVariable url: String, author: Author): Mono<Boolean> {
         return postService.isUrlAvailable(postId, url, author)
     }
 
+    @Authorization(Role.USER)
     @PutMapping("/{postId}")
     fun updatePost(
         @PathVariable postId: String,
@@ -40,6 +46,7 @@ class PostController(
         return postService.updatePost(postId, postDetailsView, author).map { PostDetailsView.from(it) }
     }
 
+    @Authorization(Role.USER)
     @GetMapping("/my-posts/page/{page}/limit/{limit}")
     fun getMyPost(@PathVariable limit: Int, @PathVariable page: Int, author: Author): Flux<PostSummaryView> {
         return postService.getMyAllPosts(page, limit, author).map {
@@ -47,6 +54,7 @@ class PostController(
         }
     }
 
+    @Authorization(Role.USER)
     @GetMapping("/my-posts/count")
     fun getMyPostCount(author: Author): Mono<Long> {
         return postService.getMyPostsCount(author)
@@ -57,6 +65,7 @@ class PostController(
         return postService.getPostDetails(url).map { PostDetailsView.from(it) }
     }
 
+    @Authorization(Role.USER)
     @PutMapping("/{postId}/like-or-dislike")
     fun addLikeOrDislikeOnComment(
         @PathVariable postId: PostId,
@@ -74,7 +83,7 @@ class PostController(
     }
 
     @GetMapping("/count")
-    fun getSidebar(): Mono<Long> {
+    fun getPublishedPostsCount(): Mono<Long> {
         return postService.getPostsCount()
     }
 

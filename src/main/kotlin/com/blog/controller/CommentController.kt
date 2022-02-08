@@ -2,6 +2,7 @@ package com.blog.controller
 
 import com.blog.controller.view.CommentView
 import com.blog.domain.*
+import com.blog.security.authorization.Authorization
 import com.blog.service.CommentService
 import org.springframework.web.bind.annotation.*
 import reactor.core.publisher.Flux
@@ -18,11 +19,13 @@ class CommentController(
         return commentService.getAllApprovedComments(postId).map { CommentView.from(it) }
     }
 
+    @Authorization(Role.USER)
     @PostMapping("/{postId}")
     fun addComments(@PathVariable postId: PostId, @RequestBody commentRequest: CommentRequest): Mono<CommentView> {
         return commentService.addComment(postId, commentRequest).map { CommentView.from(it) }
     }
 
+    @Authorization(Role.USER)
     @PutMapping("/{commentId}")
     fun addLikeOrDislikeOnComment(
         @PathVariable commentId: CommentId,

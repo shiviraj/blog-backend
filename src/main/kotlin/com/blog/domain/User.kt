@@ -45,11 +45,13 @@ data class User(
     }
 }
 
-enum class Role {
-    DUMMY,
-    USER,
-    ADMIN,
-    OWNER
+enum class Role(private val sequenceId: Int) {
+    DUMMY(0),
+    USER(1),
+    ADMIN(2),
+    OWNER(3);
+
+    fun isJunior(allowedRole: Role) = this.sequenceId < allowedRole.sequenceId
 }
 
 enum class LoginSource {

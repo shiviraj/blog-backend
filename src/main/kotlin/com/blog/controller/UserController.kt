@@ -3,8 +3,10 @@ package com.blog.controller
 import com.blog.controller.view.AuthenticationResponse
 import com.blog.controller.view.AuthorView
 import com.blog.controller.view.UserView
+import com.blog.domain.Role
 import com.blog.domain.User
 import com.blog.domain.UserId
+import com.blog.security.authorization.Authorization
 import com.blog.service.TokenService
 import com.blog.service.UserService
 import org.springframework.http.HttpHeaders
@@ -21,6 +23,7 @@ class UserController(
     val userService: UserService,
     val tokenService: TokenService
 ) {
+    @Authorization(Role.USER)
     @GetMapping("/me")
     fun validateUser(user: User): Mono<AuthorView> {
         return Mono.just(AuthorView.from(user))
@@ -38,6 +41,7 @@ class UserController(
         return userService.getUserByUserId(userId).map { UserView.from(it) }
     }
 
+    @Authorization(Role.USER)
     @GetMapping("/logout")
     fun logoutUser(request: HttpServletRequest, user: User): Mono<UserView> {
         val authorization = request.getHeader(HttpHeaders.AUTHORIZATION) as String

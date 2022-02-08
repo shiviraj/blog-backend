@@ -4,6 +4,8 @@ import com.blog.controller.view.CategoryView
 import com.blog.controller.view.PostSummaryView
 import com.blog.domain.Author
 import com.blog.domain.CategoryId
+import com.blog.domain.Role
+import com.blog.security.authorization.Authorization
 import com.blog.service.CategoryService
 import com.blog.service.PostService
 import org.springframework.web.bind.annotation.*
@@ -34,6 +36,7 @@ class CategoryController(
         return postService.getAllPostsByCategory(categoryUrl)
     }
 
+    @Authorization(Role.USER)
     @PostMapping
     fun addNewCategory(@RequestBody categoryRequest: CategoryRequest, author: Author): Mono<CategoryView> {
         return categoryService.addNewCategory(categoryRequest, author)

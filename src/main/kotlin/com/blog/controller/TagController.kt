@@ -2,7 +2,9 @@ package com.blog.controller
 
 import com.blog.controller.view.TagView
 import com.blog.domain.Author
+import com.blog.domain.Role
 import com.blog.domain.TagId
+import com.blog.security.authorization.Authorization
 import com.blog.service.TagService
 import org.springframework.web.bind.annotation.*
 import reactor.core.publisher.Flux
@@ -13,6 +15,7 @@ import reactor.core.publisher.Mono
 class TagController(
     val tagService: TagService
 ) {
+    @Authorization(Role.USER)
     @PostMapping
     fun addNewTag(@RequestBody tagRequest: TagRequest, author: Author): Mono<TagView> {
         return tagService.addNewTag(tagRequest, author).map { TagView.from(it) }
