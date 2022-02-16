@@ -22,13 +22,11 @@ class OauthService(
     }
 
     fun signIn(code: CodeRequest): Mono<Pair<Token, User>> {
-        return githubGateway.getAccessTokens(code.code).flatMap {
-            Mono.zip(
-                githubGateway.getUserProfile(it),
-                githubGateway.getUserEmail(it)
-            )
+        return githubGateway.getAccessTokens(code.code).flatMap { accessTokenResponse ->
+            githubGateway.getUserProfile(accessTokenResponse)
+                .map { Pair(it, accessTokenResponse) }
         }.flatMap {
-            userService.signInUserFromOauth(it.t1, it.t2)
+            userService.signInUserFromOauth(it)
         }.flatMap { user ->
             tokenService.generateToken(user).map {
                 Pair(it, user)

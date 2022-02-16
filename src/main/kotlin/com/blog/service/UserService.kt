@@ -1,9 +1,7 @@
 package com.blog.service
 
-import com.blog.domain.GithubUser
-import com.blog.domain.GithubUserEmail
-import com.blog.domain.Token
-import com.blog.domain.User
+import com.blog.domain.*
+import com.blog.gateway.GithubGateway
 import com.blog.repository.UserRepository
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
@@ -12,33 +10,41 @@ import reactor.core.publisher.Mono
 class UserService(
     val userRepository: UserRepository,
     val idGeneratorService: IdGeneratorService,
-    val tokenService: TokenService
+    val tokenService: TokenService,
+    val githubGateway: GithubGateway
 ) {
 
-    fun signInUserFromOauth(githubUser: GithubUser, githubUserEmail: GithubUserEmail): Mono<User> {
-        return userRepository.findByUsername(githubUser.username)
-            .switchIfEmpty(registerNewUser(githubUser, githubUserEmail))
+    fun signInUserFromOauth(githubUser: Pair<GithubUser, AccessTokenResponse>): Mono<User> {
+        return userRepository.findByUsername(githubUser.first.username)
+            .switchIfEmpty(registerNewUser(githubUser))
     }
 
-    private fun registerNewUser(githubUser: GithubUser, githubUserEmail: GithubUserEmail): Mono<User> {
-        return idGeneratorService.generateId(IdType.UserId)
-            .flatMap { userId ->
-                save(
-                    User(
-                        uniqueId = githubUser.id.toString(),
-                        name = githubUser.name ?: githubUser.username,
-                        userId = userId,
-                        email = githubUserEmail.email,
-                        emailVerified = githubUserEmail.verified,
-                        profile = githubUser.profile,
-                        location = githubUser.location,
-                        source = githubUser.source,
-                        username = githubUser.username
-                    )
-                )
+    private fun registerNewUser(githubUser: Pair<GithubUser, AccessTokenResponse>): Mono<User> {
+        val user = githubUser.first
+        return githubGateway.getUserEmail(githubUser.second)
+            .doOnError {
+                Mono.just(GithubUserEmail(email = ""))
             }
-            .logOnSuccess("Successfully registered a new user", mapOf("user" to githubUser.username))
-            .logOnError("Failed to register a new user", mapOf("user" to githubUser.username))
+            .flatMap { githubUserEmail ->
+                idGeneratorService.generateId(IdType.UserId)
+                    .flatMap { userId ->
+                        save(
+                            User(
+                                uniqueId = user.id.toString(),
+                                name = user.name ?: user.username,
+                                userId = userId,
+                                email = githubUserEmail.email,
+                                emailVerified = githubUserEmail.verified,
+                                profile = user.profile,
+                                location = user.location,
+                                source = user.source,
+                                username = user.username
+                            )
+                        )
+                    }
+            }
+            .logOnSuccess("Successfully registered a new user", mapOf("user" to user.username))
+            .logOnError("Failed to register a new user", mapOf("user" to user.username))
     }
 
     fun getUserByUserId(userId: String): Mono<User> {
