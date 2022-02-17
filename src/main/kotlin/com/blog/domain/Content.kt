@@ -13,7 +13,8 @@ data class Content(
     }
 
     fun getTruncateContent(): String {
-        val content = blocks.filter { it.type == "paragraph" }.subList(0, 7)
+        val blocks = blocks.filter { it.type == "paragraph" }
+        val content = blocks.subList(0, blocks.size.coerceAtMost(7))
             .joinToString("\n") { it.data["text"] as String }
         return content.substring(0, content.length.coerceAtMost(500))
     }
