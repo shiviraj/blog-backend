@@ -21,8 +21,12 @@ class CommentController(
 
     @Authorization(Role.USER)
     @PostMapping("/{postId}")
-    fun addComments(@PathVariable postId: PostId, @RequestBody commentRequest: CommentRequest): Mono<CommentView> {
-        return commentService.addComment(postId, commentRequest).map { CommentView.from(it) }
+    fun addComments(
+        @PathVariable postId: PostId,
+        @RequestBody commentRequest: CommentRequest,
+        user: User
+    ): Mono<CommentView> {
+        return commentService.addComment(postId, commentRequest, user).map { CommentView.from(it) }
     }
 
     @Authorization(Role.USER)
@@ -38,4 +42,4 @@ class CommentController(
 }
 
 data class LikeOrDislikeRequest(val action: Action)
-data class CommentRequest(val userId: UserId, val message: String, val parentComment: CommentId? = null)
+data class CommentRequest(val message: String, val parentComment: CommentId? = null)

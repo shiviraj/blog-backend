@@ -35,22 +35,21 @@ class CommentService(
             }
     }
 
-    fun addComment(postId: PostId, commentRequest: CommentRequest): Mono<CommentDetails> {
+    fun addComment(postId: PostId, commentRequest: CommentRequest, user: User): Mono<CommentDetails> {
         return idGeneratorService.generateId(IdType.CommentId)
             .flatMap { commentId ->
                 save(
                     Comment(
                         commentId = commentId,
-                        userId = commentRequest.userId,
+                        userId = user.userId,
                         postId = postId,
                         message = commentRequest.message,
                         status = CommentStatus.UNAPPROVED,
                         parentComment = commentRequest.parentComment,
                     )
-                )
-            }.flatMap {
-                userService.getUserByUserId(it.userId)
-                    .map { user -> CommentDetails.from(it, user) }
+                ).map {
+                    CommentDetails.from(it, user)
+                }
             }
     }
 
