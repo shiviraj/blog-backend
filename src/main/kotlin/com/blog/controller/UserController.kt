@@ -1,6 +1,5 @@
 package com.blog.controller
 
-import com.blog.controller.view.AuthenticationResponse
 import com.blog.controller.view.AuthorView
 import com.blog.controller.view.UserView
 import com.blog.domain.Role
@@ -30,10 +29,8 @@ class UserController(
     }
 
     @GetMapping("/dummy")
-    fun getDummyUser(): Mono<AuthenticationResponse> {
-        return userService.getDummyUser().map {
-            AuthenticationResponse(it.first.getValue(), AuthorView.from(it.second))
-        }
+    fun getDummyUser(): Mono<Map<String, String>> {
+        return userService.getDummyUser().map { mapOf("token" to it.getValue()) }
     }
 
     @GetMapping("/{userId}")

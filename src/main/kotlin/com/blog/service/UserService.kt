@@ -66,10 +66,9 @@ class UserService(
             .logOnError("Failed to fetch user from token")
     }
 
-    fun getDummyUser(): Mono<Pair<Token, User>> {
+    fun getDummyUser(): Mono<Token> {
         return idGeneratorService.generateId(IdType.DummyUserId).flatMap { userId ->
-            val user = User.createDummy(userId)
-            tokenService.generateToken(user).map { Pair(it, user) }
+            tokenService.generateToken(User.createDummy(userId))
         }
     }
 }
