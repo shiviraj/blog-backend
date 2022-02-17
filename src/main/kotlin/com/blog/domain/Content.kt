@@ -13,9 +13,11 @@ data class Content(
     }
 
     fun getTruncateContent(): String {
-        val blocks = blocks.filter { it.type == "paragraph" }
-        val content = blocks.subList(0, blocks.size.coerceAtMost(7))
-            .joinToString("\n") { it.data["text"] as String }
+        val content = blocks.filter { it.type == "paragraph" }
+            .map { it.data["text"] as String }
+            .flatMap { it.split("<br>") }
+            .subList(0, blocks.size.coerceAtMost(7))
+            .joinToString("<br/>")
         return content.substring(0, content.length.coerceAtMost(500))
     }
 }
