@@ -23,5 +23,6 @@ interface PostRepository : ReactiveCrudRepository<Post, String> {
         pageable: Pageable
     ): Flux<Post>
 
+    fun findAllByAuthorIdAndPostStatus(authorId: AuthorId, status: PostStatus = PostStatus.PUBLISH): Flux<Post>
     fun countAllByCategoriesAndPostStatus(categoryId: CategoryId, status: PostStatus = PostStatus.PUBLISH): Mono<Long>
 }

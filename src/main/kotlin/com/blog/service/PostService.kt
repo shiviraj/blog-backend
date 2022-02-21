@@ -8,7 +8,6 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
-import reactor.util.function.Tuple5
 
 @Service
 class PostService(
@@ -40,11 +39,7 @@ class PostService(
     }
 
 
-    fun getMyAllPosts(
-        page: Int,
-        limit: Int,
-        author: Author
-    ): Flux<Tuple5<Post, List<Tag>, List<Category>, Author, Long>> {
+    fun getMyAllPosts(page: Int, limit: Int, author: Author): Flux<PostSummary> {
         return postRepository.findAllByAuthorIdOrderByPostIdAsc(author.userId, PageRequest.of(page, limit))
             .flatMap { getPostDetails(it) }
     }
@@ -88,23 +83,23 @@ class PostService(
         .logOnSuccess("Successfully update post in db", mapOf("postId" to post.postId))
         .logOnError("Failed to update post in db", mapOf("postId" to post.postId))
 
-    fun getAllPosts(page: Int): Flux<Tuple5<Post, List<Tag>, List<Category>, Author, Long>> {
+    fun getAllPosts(page: Int): Flux<PostSummary> {
         return postRepository.findAllByPostStatusOrderByLastUpdateOnDesc(
             PostStatus.PUBLISH,
             PageRequest.of(page - 1, 10)
         ).flatMapSequential { getPostDetails(it) }
     }
 
-    private fun getPostDetails(
-        post: Post
-    ): Mono<Tuple5<Post, List<Tag>, List<Category>, Author, Long>> {
+    private fun getPostDetails(post: Post): Mono<PostSummary> {
         return Mono.zip(
             Mono.just(post),
             tagService.getAllTags(post.tags.toList()).collectList(),
             categoryService.getAllCategories(post.categories.toList()).collectList(),
             authorService.getUserByUserId(post.authorId),
             commentService.countAllComments(post.postId)
-        )
+        ).map {
+            PostSummary(post = it.t1, tags = it.t2, categories = it.t3, author = it.t4, comments = it.t5)
+        }
     }
 
     fun getPostsCount() = postRepository.countAllByPostStatus()
@@ -117,7 +112,7 @@ class PostService(
     fun getAllPostsByCategories(
         categoryUrl: String,
         page: Int
-    ): Flux<Tuple5<Post, List<Tag>, List<Category>, Author, Long>> {
+    ): Flux<PostSummary> {
         return categoryService.findByUrl(categoryUrl).flatMapMany {
             postRepository.findAllByCategoriesAndPostStatusOrderByLastUpdateOnDesc(
                 it.categoryId,
@@ -126,5 +121,16 @@ class PostService(
             )
         }.flatMap { post -> getPostDetails(post) }
     }
+
+    fun getPostsOf(authorId: AuthorId): Flux<PostSummary> {
+        return postRepository.findAllByAuthorIdAndPostStatus(authorId).flatMap { getPostDetails(it) }
+    }
 }
 
+data class PostSummary(
+    val post: Post,
+    val tags: List<Tag>,
+    val categories: List<Category>,
+    val author: Author,
+    val comments: Long
+)

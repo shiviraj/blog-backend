@@ -28,7 +28,7 @@ class CategoryController(
     @GetMapping("/{categoryUrl}/posts/page/{page}")
     fun getAllPosts(@PathVariable categoryUrl: String, @PathVariable page: Int): Flux<PostSummaryView> {
         return postService.getAllPostsByCategories(categoryUrl, page)
-            .map { PostSummaryView.from(it.t1, it.t2, it.t3, it.t4, it.t5) }
+            .map { PostSummaryView.from(it) }
     }
 
     @GetMapping("/{categoryUrl}/posts/count")

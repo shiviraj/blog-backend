@@ -1,6 +1,10 @@
 package com.blog.controller.view
 
-import com.blog.domain.*
+import com.blog.domain.PostId
+import com.blog.domain.PostStatus
+import com.blog.domain.UserId
+import com.blog.domain.Visibility
+import com.blog.service.PostSummary
 import java.time.LocalDateTime
 
 data class PostSummaryView(
@@ -23,29 +27,25 @@ data class PostSummaryView(
 ) {
     companion object {
         fun from(
-            post: Post,
-            tags: List<Tag>,
-            categories: List<Category>,
-            author: Author,
-            comments: Long
+            postSummary: PostSummary
         ): PostSummaryView {
             return PostSummaryView(
-                postId = post.postId,
-                url = post.getUrl(),
-                title = post.getTitle(),
-                author = AuthorView.from(author),
-                tags = tags.map { TagView.from(it) }.toSet(),
-                categories = categories.map { CategoryView.from(it) }.toSet(),
-                postStatus = post.getStatus(),
-                visibility = post.getVisibility(),
-                likes = post.likes,
-                dislikes = post.dislikes,
-                comments = comments,
-                createdAt = post.createdAt,
-                lastUpdatedAt = post.getLastUpdateOn(),
-                publishedOn = post.getPublishedOn(),
-                featuredImage = post.getFeaturedImage(),
-                content = post.publishedContent.getTruncateContent()
+                postId = postSummary.post.postId,
+                url = postSummary.post.getUrl(),
+                title = postSummary.post.getTitle(),
+                author = AuthorView.from(postSummary.author),
+                tags = postSummary.tags.map { TagView.from(it) }.toSet(),
+                categories = postSummary.categories.map { CategoryView.from(it) }.toSet(),
+                postStatus = postSummary.post.getStatus(),
+                visibility = postSummary.post.getVisibility(),
+                likes = postSummary.post.likes,
+                dislikes = postSummary.post.dislikes,
+                comments = postSummary.comments,
+                createdAt = postSummary.post.createdAt,
+                lastUpdatedAt = postSummary.post.getLastUpdateOn(),
+                publishedOn = postSummary.post.getPublishedOn(),
+                featuredImage = postSummary.post.getFeaturedImage(),
+                content = postSummary.post.publishedContent.getTruncateContent()
             )
         }
     }

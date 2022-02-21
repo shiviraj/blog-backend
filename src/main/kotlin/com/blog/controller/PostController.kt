@@ -2,10 +2,7 @@ package com.blog.controller
 
 import com.blog.controller.view.PostDetailsView
 import com.blog.controller.view.PostSummaryView
-import com.blog.domain.Author
-import com.blog.domain.PostId
-import com.blog.domain.Role
-import com.blog.domain.User
+import com.blog.domain.*
 import com.blog.security.authorization.Authorization
 import com.blog.service.PostService
 import org.springframework.web.bind.annotation.*
@@ -50,7 +47,7 @@ class PostController(
     @GetMapping("/my-posts/page/{page}/limit/{limit}")
     fun getMyPost(@PathVariable limit: Int, @PathVariable page: Int, author: Author): Flux<PostSummaryView> {
         return postService.getMyAllPosts(page, limit, author).map {
-            PostSummaryView.from(it.t1, it.t2, it.t3, it.t4, it.t5)
+            PostSummaryView.from(it)
         }
     }
 
@@ -78,7 +75,7 @@ class PostController(
     @GetMapping("/page/{page}")
     fun getPosts(@PathVariable page: Int): Flux<PostSummaryView> {
         return postService.getAllPosts(page).map {
-            PostSummaryView.from(it.t1, it.t2, it.t3, it.t4, it.t5)
+            PostSummaryView.from(it)
         }
     }
 
@@ -87,5 +84,9 @@ class PostController(
         return postService.getPostsCount()
     }
 
+    @GetMapping("/author/{authorId}")
+    fun getPostsOf(@PathVariable authorId: AuthorId): Flux<PostSummaryView> {
+        return postService.getPostsOf(authorId).map { PostSummaryView.from(it) }
+    }
 }
 
