@@ -2,6 +2,7 @@ package com.blog.service
 
 import com.blog.domain.Token
 import com.blog.domain.User
+import com.blog.domain.UserType
 import com.blog.repository.TokenRepository
 import com.blog.security.crypto.Crypto
 import org.springframework.security.core.userdetails.UserDetails
@@ -36,7 +37,13 @@ class TokenService(
 
     fun extractToken(token: String) = tokenRepository.findByValue(token).map {
         it.updateValue(crypto.decrypt(it.getValue()))
-    }.logOnSuccess("Successfully get token")
+    }
+        .switchIfEmpty(
+            Mono.just(
+                Token(userId = "userId", userType = UserType.DUMMY, value = "")
+            )
+        )
+        .logOnSuccess("Successfully get token")
         .logOnError("Failed to get token")
 
     private fun save(token: Token) = tokenRepository.save(token)

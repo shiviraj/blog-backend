@@ -29,16 +29,12 @@ class WebTokenFilter(val userService: UserService) : OncePerRequestFilter() {
         filterChain: FilterChain,
         response: HttpServletResponse
     ) {
-        val user = userService.extractUser(token).block()
-        if (token.isEmpty() || user == null) {
-            SecurityContextHolder.getContext().authentication = null
-        } else {
-            val authenticationToken = UsernamePasswordAuthenticationToken("username", null, emptyList())
-            authenticationToken.details = WebAuthenticationDetailsSource().buildDetails(request)
-            SecurityContextHolder.getContext().authentication = authenticationToken
-            request.setAttribute("user", user)
-            Logger.info("Successfully validate user", mapOf("userId" to user.userId))
-        }
+        val user = userService.extractUser(token).block()!!
+        val authenticationToken = UsernamePasswordAuthenticationToken("username", null, emptyList())
+        authenticationToken.details = WebAuthenticationDetailsSource().buildDetails(request)
+        SecurityContextHolder.getContext().authentication = authenticationToken
+        request.setAttribute("user", user)
+        Logger.info("Successfully validate user", mapOf("userId" to user.userId))
         filterChain.doFilter(request, response)
     }
 }
