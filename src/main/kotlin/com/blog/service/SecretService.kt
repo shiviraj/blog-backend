@@ -25,9 +25,19 @@ class SecretService(private val secretRepository: SecretRepository, private val 
             }
             .switchIfEmpty(Mono.error(DataNotFound(BlogError.BLOG604)))
     }
+
+    fun getNotifierBot(): Mono<Secret> {
+        return getSecret(SecretKeys.BOT)
+    }
+
+    fun getNotifierChatId(): Mono<Secret> {
+        return getSecret(SecretKeys.CHAT_ID)
+    }
 }
 
 enum class SecretKeys {
     GITHUB_CLIENT_ID,
-    GITHUB_CLIENT_SECRET
+    GITHUB_CLIENT_SECRET,
+    BOT,
+    CHAT_ID
 }

@@ -18,6 +18,7 @@ enum class IdType(val length: Int) {
     PostId(10),
     CommentId(10),
     CategoryId(3),
+    MessageId(20),
     TagId(5),
 }
 
