@@ -2,6 +2,8 @@ package com.blog.service
 
 import com.blog.controller.MessageRequest
 import com.blog.domain.Message
+import com.blog.exceptions.error_code.BlogError
+import com.blog.exceptions.exceptions.BaseException
 import com.blog.repository.MessageRepository
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
@@ -29,6 +31,12 @@ class MessageService(
                     .flatMap {
                         message.alertSent = true
                         messageRepository.save(message)
+                    }
+                    .onErrorResume {
+                        messageRepository.delete(message)
+                            .map {
+                                throw BaseException(BlogError.BLOG604)
+                            }
                     }
             }
     }

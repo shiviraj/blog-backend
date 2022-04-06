@@ -13,8 +13,6 @@ class Notifier(val webClientWrapper: WebClientWrapper, private val secretService
             .flatMap {
                 val bot = it.t1
                 val chatId = it.t2
-                println(bot)
-                println(chatId)
                 webClientWrapper.post(
                     baseUrl = "https://api.telegram.org",
                     path = "/bot${bot.value}/sendMessage",
@@ -33,10 +31,10 @@ class Notifier(val webClientWrapper: WebClientWrapper, private val secretService
     private fun createMessage(message: Message): String {
         return """
             <b>Received message from Contact us: Shiviraj.com</b>
-            <p>Name: ${message.name}</p>
-            <p>Email: ${message.email}</p>
-            <p>Subject: ${message.subject}</p>
-            <p>Message: ${message.message}</p>
+            Name: ${message.name}
+            Email: ${message.email}
+            Subject: ${message.subject}
+            Message: ${message.message}
             Please get in touch your customer soon!!
             """
     }
