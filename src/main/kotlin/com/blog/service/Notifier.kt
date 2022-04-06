@@ -13,6 +13,8 @@ class Notifier(val webClientWrapper: WebClientWrapper, private val secretService
             .flatMap {
                 val bot = it.t1
                 val chatId = it.t2
+                println(bot)
+                println(chatId)
                 webClientWrapper.post(
                     baseUrl = "https://api.telegram.org",
                     path = "/bot${bot.value}/sendMessage",
